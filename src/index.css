@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-hajj-50: #faf6f2;
+  --color-hajj-100: #f4ece3;
+  --color-hajj-200: #eadacf;
+  --color-hajj-300: #dbc0ac;
+  --color-hajj-400: #c5a183;
+  --color-hajj-500: #a77c57;
+  --color-hajj-600: #8a623d;
+  --color-hajj-700: #6f4b2b; /* Official Kementerian Haji dan Umrah RI Chocolate Brown */
+  --color-hajj-800: #55381e;
+  --color-hajj-900: #412813;
+  --color-hajj-950: #26160a;
+
+  --color-gold-50: #fefdf8;
+  --color-gold-100: #fdf8e9;
+  --color-gold-200: #faefce;
+  --color-gold-300: #f3dfa2;
+  --color-gold-400: #e8ca6e;
+  --color-gold-500: #cca241; /* Official Ministry Emblem Warm Gold */
+  --color-gold-600: #af832f;
+  --color-gold-700: #8c6422;
+  --color-gold-800: #6e4e1c;
+  --color-gold-900: #573e17;
+
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body { 
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  background-color: #faf7f5;
+  color: #1e293b;
+}
+
+.dark body {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+.dark .bg-white {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.dark .border-slate-200,
+.dark .border-slate-300 {
+  border-color: #334155 !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-amber-50,
+.dark .bg-emerald-50,
+.dark .bg-blue-50,
+.dark .bg-indigo-50,
+.dark .bg-purple-50,
+.dark .bg-rose-50 {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.dark table th {
+  color: #e2e8f0 !important;
+}
+
+.dark table td {
+  color: #cbd5e1 !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: #f5efe9; border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #d7c2af; border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6f4b2b; }
+
+@media print {
+    .no-print { display: none !important; }
+    .print-only { display: block !important; }
+    
+    /* Ensure clean sheet for printing */
+    html, body {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      height: auto !important;
+      min-height: auto !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* When printing invoice, hide standard UI chrome to prevent blank pages or overlapping backgrounds */
+    body.printing-invoice header,
+    body.printing-invoice main,
+    body.printing-invoice #floating-chat-container,
+    body.printing-invoice #floating-chat-panel,
+    body.printing-invoice .toast-container,
+    body.has-invoice-open header,
+    body.has-invoice-open main,
+    body.has-invoice-open #floating-chat-container,
+    body.has-invoice-open #floating-chat-panel,
+    body.has-invoice-open .toast-container {
+      display: none !important;
+    }
+
+    /* Reset modal overlay constraints so Chromium print engine renders full document flow */
+    #invoice-modal-overlay {
+      position: static !important;
+      inset: auto !important;
+      background: #ffffff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: visible !important;
+      display: block !important;
+      z-index: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: auto !important;
+    }
+
+    #invoice-modal-card {
+      position: static !important;
+      background: #ffffff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      max-height: none !important;
+      height: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow: visible !important;
+      display: block !important;
+    }
+
+    #invoice-printable-sheet {
+      position: static !important;
+      display: block !important;
+      visibility: visible !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 4mm 6mm !important;
+      box-shadow: none !important;
+      border: none !important;
+      background: #ffffff !important;
+      overflow: visible !important;
+      page-break-inside: auto;
+      break-inside: auto;
+    }
+
+    #invoice-printable-sheet table tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    #invoice-printable-sheet * {
+      visibility: visible !important;
+    }
+
+    @page {
+      size: auto;
+      margin: 8mm 10mm;
+    }
+}

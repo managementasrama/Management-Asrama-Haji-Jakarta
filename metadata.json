@@ -1,0 +1,8 @@
+{
+  "name": "V13 Management Asrama Haji",
+  "description": "Pengelola Penginapan Asrama Haji Jakarta",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
