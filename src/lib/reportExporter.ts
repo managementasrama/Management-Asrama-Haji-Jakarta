@@ -314,10 +314,14 @@ export function generateReportData(params: ReportExportParams) {
       let svcDetails = t.breakfast ? `Sarapan (${t.breakfastPortions || 1} Porsi)` : 'Standar';
       if (t.extraBed) svcDetails += ` + Bed (${t.extraBedCount || 1})`;
 
+      const bookingTypeLabel = t.isGroup || t.guestType === 'ROMBONGAN' || t.groupId
+        ? `Rombongan (${t.groupName || 'Grup'})`
+        : 'Penyewaan Kamar Individu';
+
       rows.push([
         rowCounter++,
         t.id,
-        'Kamar Individu (1 Penyewa)',
+        bookingTypeLabel,
         t.guestName,
         t.building,
         `Kamar ${t.roomNumber} (1 Kamar)`,

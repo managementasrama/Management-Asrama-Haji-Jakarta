@@ -1798,13 +1798,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const openModal = (modalId: string, data?: any) => {
-    if (modalId === 'modalCheckin' && data?.roomId) {
-      const room = rooms.find(r => r.id === data.roomId || r.roomNumber === data.roomId);
-      if (room && room.qcStatus && room.qcStatus !== 'LOLOS_QC') {
-        showToast(`Fasilitas ${room.roomNumber} (${room.building}) belum lolos QC (Status: ${room.qcStatus.replace(/_/g, ' ')}). Belum dapat digunakan untuk pemesanan/check-in!`, 'error');
-        return;
-      }
-    }
     setModalState(prev => ({ ...prev, [modalId]: { isOpen: true, data } }));
   };
 
@@ -1885,6 +1878,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     dataStorage.saveBuilding(building);
     setBuildings(dataStorage.getBuildings());
+    setRooms(dataStorage.getRooms());
+    setMeetingRooms(dataStorage.getMeetingRooms());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
+    setQcInspections(dataStorage.getQcInspections());
     showToast(`Gedung "${building.name}" berhasil ditambahkan ke database!`, 'success');
     logAudit('Tambah Gedung', `Menambahkan gedung baru: ${building.name} (${building.code}) - ${building.totalRooms} Kamar`);
   };
@@ -1896,6 +1894,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     dataStorage.saveBuilding(building);
     setBuildings(dataStorage.getBuildings());
+    setRooms(dataStorage.getRooms());
+    setMeetingRooms(dataStorage.getMeetingRooms());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
+    setQcInspections(dataStorage.getQcInspections());
+    setUsers(dataStorage.getUsers());
     showToast(`Data gedung "${building.name}" berhasil diperbarui!`, 'success');
     logAudit('Ubah Gedung', `Memperbarui profil gedung: ${building.name}`);
   };
@@ -1913,6 +1917,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     setBuildings(dataStorage.getBuildings());
     setRooms(dataStorage.getRooms());
+    setMeetingRooms(dataStorage.getMeetingRooms());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
+    setQcInspections(dataStorage.getQcInspections());
     showToast(res.message, 'info');
     logAudit('Hapus Gedung', `Menghapus gedung: ${bld?.name || buildingId}`);
     return true;
@@ -1929,6 +1937,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     dataStorage.saveMeetingRoom(mr);
     setMeetingRooms(dataStorage.getMeetingRooms());
     setRooms(dataStorage.getRooms());
+    setBuildings(dataStorage.getBuildings());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
     showToast(`Ruang Pertemuan "${mr.name}" berhasil ditambahkan ke database!`, 'success');
     logAudit('Tambah Ruang Pertemuan', `Menambahkan ruang pertemuan: ${mr.name} (Kapasitas: ${mr.capacity} orang)`);
   };
@@ -1941,6 +1952,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     dataStorage.saveMeetingRoom(mr);
     setMeetingRooms(dataStorage.getMeetingRooms());
     setRooms(dataStorage.getRooms());
+    setBuildings(dataStorage.getBuildings());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
     showToast(`Data ruang pertemuan "${mr.name}" berhasil diperbarui!`, 'success');
     logAudit('Ubah Ruang Pertemuan', `Memperbarui ruang pertemuan: ${mr.name}`);
   };
@@ -1958,6 +1972,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     setMeetingRooms(dataStorage.getMeetingRooms());
     setRooms(dataStorage.getRooms());
+    setBuildings(dataStorage.getBuildings());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
     showToast(res.message, 'info');
     logAudit('Hapus Ruang Pertemuan', `Menghapus ruang pertemuan: ${mr?.name || mrId}`);
     return true;
@@ -1973,6 +1990,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     dataStorage.saveRoom(room);
     setRooms(dataStorage.getRooms());
+    setBuildings(dataStorage.getBuildings());
+    setMeetingRooms(dataStorage.getMeetingRooms());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
+    setQcInspections(dataStorage.getQcInspections());
     showToast(`Kamar ${room.roomNumber} (${room.building}) berhasil ditambahkan ke database!`, 'success');
     logAudit('Tambah Kamar', `Menambah kamar: No ${room.roomNumber}, Gedung ${room.building}, Tipe ${room.type}`);
   };
@@ -1984,6 +2006,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     dataStorage.saveRoom(room);
     setRooms(dataStorage.getRooms());
+    setBuildings(dataStorage.getBuildings());
+    setMeetingRooms(dataStorage.getMeetingRooms());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
+    setQcInspections(dataStorage.getQcInspections());
     showToast(`Data kamar ${room.roomNumber} berhasil diperbarui!`, 'success');
     logAudit('Ubah Kamar', `Memperbarui kamar: ${room.roomNumber} (${room.building})`);
   };
@@ -2000,6 +2027,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return false;
     }
     setRooms(dataStorage.getRooms());
+    setBuildings(dataStorage.getBuildings());
+    setMeetingRooms(dataStorage.getMeetingRooms());
+    setTransactions(dataStorage.getTransactions());
+    setMaintenances(dataStorage.getMaintenances());
+    setQcInspections(dataStorage.getQcInspections());
     showToast(res.message, 'info');
     logAudit('Hapus Kamar', `Menghapus kamar: ${room?.roomNumber || roomId} (${room?.building || ''})`);
     return true;

@@ -729,14 +729,22 @@ export function Modals() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 animate-in fade-in zoom-in duration-150 flex flex-col max-h-[92vh] my-auto">
             <div className="bg-gradient-to-r from-hajj-800 to-hajj-900 px-6 py-4 text-white flex items-center justify-between shrink-0">
               <div>
-                <h3 className="font-bold text-base">
-                  {checkinData.actionType === 'EDIT_BOOKING'
-                    ? `Sesuaikan Data Reservasi`
-                    : checkinData.actionType === 'BOOKING' 
-                    ? `Booking ${room?.type}` 
-                    : checkinMode === 'SELECT_BOOKING' && (isKamar && transactions.filter(t => t.roomId === room?.id && t.status === 'BOOKED').length > 0)
-                      ? `Pilih Tamu Check-In ${room?.type}`
-                      : `Check-In ${room?.type}`}
+                <h3 className="font-bold text-base flex items-center space-x-2 flex-wrap gap-1">
+                  <span>
+                    {checkinData.actionType === 'EDIT_BOOKING'
+                      ? `Sesuaikan Data Reservasi`
+                      : checkinData.actionType === 'BOOKING' 
+                      ? `Booking ${room?.type}` 
+                      : checkinMode === 'SELECT_BOOKING' && (isKamar && transactions.filter(t => t.roomId === room?.id && t.status === 'BOOKED').length > 0)
+                        ? `Pilih Tamu Check-In ${room?.type}`
+                        : `Check-In ${room?.type}`}
+                  </span>
+                  {room && (!room.qcStatus || room.qcStatus !== 'LOLOS_QC') && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-amber-400 text-amber-950 rounded-full inline-flex items-center space-x-1 shadow-2xs">
+                      <i className="fa-solid fa-triangle-exclamation text-[9px]"></i>
+                      <span>Perlu Cek QC</span>
+                    </span>
+                  )}
                 </h3>
                 <p className="text-xs text-gold-300">{room?.building} - {room?.roomNumber}</p>
               </div>
@@ -763,6 +771,30 @@ export function Modals() {
                 </button>
               </div>
             </div>
+
+            {/* QC STATUS ALERT BANNER DI BAGIAN ATAS POPUP FORM */}
+            {room && (!room.qcStatus || room.qcStatus !== 'LOLOS_QC') && (
+              <div className="bg-amber-50 border-b-2 border-amber-300 px-6 py-3 text-amber-900 flex items-start space-x-3 shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-amber-200 text-amber-800 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <i className="fa-solid fa-triangle-exclamation text-base text-amber-700"></i>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center space-x-2 flex-wrap gap-1">
+                    <span className="font-extrabold text-xs uppercase tracking-wide text-amber-900">Perlu Cek QC</span>
+                    <span className="text-[10px] font-bold px-2 py-0.2 bg-amber-200/90 text-amber-950 border border-amber-300 rounded-md">
+                      {room.qcStatus === 'MENUNGGU_QC'
+                        ? 'Menunggu Verifikasi QC'
+                        : room.qcStatus === 'PERLU_PERBAIKAN'
+                        ? 'Perlu Perbaikan Teknisi'
+                        : 'Belum Diinspeksi QC'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-amber-800 mt-1 leading-relaxed">
+                    Fasilitas <strong>{room.roomNumber} ({room.building})</strong> saat ini berstatus <strong>Perlu Cek QC</strong>. Formulir booking tetap dapat diisi dan diproses untuk reservasi jadwal mendatang. Pastikan inspeksi mutu telah diselesaikan sebelum tamu check-in fisik.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* JIKA MODE CHECKIN GEDUNG DAN MEMILIKI DATA BOOKING, TAMPILKAN PILIHAN TAMU BOOKING */}
             {checkinData.actionType === 'CHECKIN' && !isAula && checkinMode === 'SELECT_BOOKING' && transactions.filter(t => t.roomId === room?.id && t.status === 'BOOKED').length > 0 ? (

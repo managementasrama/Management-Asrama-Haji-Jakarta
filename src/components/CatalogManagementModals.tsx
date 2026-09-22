@@ -89,17 +89,39 @@ export function BuildingModal({ isOpen, onClose, buildingToEdit }: BuildingModal
 
   const canManage = currentUser && (isSuperAdmin(currentUser.role) || currentUser.role === 'Admin');
 
+  const isSerbagunaBuilding = category === 'SERBAGUNA';
+  const isKantorBuilding = category === 'KANTOR';
+
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
-        <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-4 flex items-center justify-between">
+        <div className={`bg-gradient-to-r ${
+          isSerbagunaBuilding 
+            ? 'from-slate-900 via-purple-950 to-slate-900' 
+            : isKantorBuilding
+            ? 'from-slate-900 via-slate-800 to-slate-900'
+            : 'from-slate-900 via-emerald-950 to-slate-900'
+        } text-white p-4 flex items-center justify-between transition-colors`}>
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center">
-              <i className="fa-solid fa-building"></i>
+            <div className={`w-8 h-8 rounded-lg ${
+              isSerbagunaBuilding
+                ? 'bg-purple-500/20 text-purple-400 border border-purple-400/30'
+                : isKantorBuilding
+                ? 'bg-slate-500/20 text-slate-300 border border-slate-400/30'
+                : 'bg-emerald-500/20 text-emerald-400 border border-emerald-400/30'
+            } flex items-center justify-center`}>
+              <i className={`fa-solid ${
+                isSerbagunaBuilding ? 'fa-landmark' : isKantorBuilding ? 'fa-briefcase' : 'fa-building'
+              }`}></i>
             </div>
             <div>
-              <h3 className="font-bold text-sm text-white">
-                {isEdit ? 'Edit Data Gedung' : 'Input Gedung Baru'}
+              <h3 className="font-bold text-sm text-white flex items-center space-x-2">
+                <span>{isEdit ? 'Edit Data Gedung' : 'Input Gedung Baru'}</span>
+                {isSerbagunaBuilding && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 font-semibold border border-purple-400/30">
+                    Serbaguna / Aula
+                  </span>
+                )}
               </h3>
               <p className="text-[10px] text-slate-300">Pangkalan Data Fasilitas UPT Asrama Haji Jakarta</p>
             </div>
@@ -188,7 +210,15 @@ export function BuildingModal({ isOpen, onClose, buildingToEdit }: BuildingModal
                 <label className="text-xs font-bold text-slate-700">Kategori Fasilitas</label>
                 <select
                   value={category}
-                  onChange={e => setCategory(e.target.value as any)}
+                  onChange={e => {
+                    const newCat = e.target.value as any;
+                    setCategory(newCat);
+                    if (newCat === 'SERBAGUNA' && (!capacityDesc || capacityDesc.includes('Kamar Hunian'))) {
+                      setCapacityDesc('Kapasitas 500 - 1000 Orang (Aula Serbaguna)');
+                    } else if (newCat === 'PENGINAPAN' && capacityDesc.includes('Aula Serbaguna')) {
+                      setCapacityDesc(`${totalRooms} Kamar Hunian Ber-AC`);
+                    }
+                  }}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 >
                   <option key="PENGINAPAN" value="PENGINAPAN">Penginapan / Asrama</option>
@@ -210,11 +240,23 @@ export function BuildingModal({ isOpen, onClose, buildingToEdit }: BuildingModal
               </div>
             </div>
 
+            {category === 'SERBAGUNA' && (
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl flex items-start space-x-2.5 text-xs text-purple-900">
+                <i className="fa-solid fa-landmark text-purple-600 text-sm mt-0.5 shrink-0"></i>
+                <div className="space-y-0.5">
+                  <span className="font-bold block text-purple-950">Terhubung Otomatis ke Katalog Ruang Pertemuan &amp; Denah</span>
+                  <p className="text-[11px] text-purple-800 leading-relaxed">
+                    Karena kategori ini adalah <strong>Serbaguna / Aula</strong>, data gedung beserta ruang pertemuannya akan otomatis disinkronkan ke Katalog Ruang Pertemuan dan Denah Kamar Dan Ruang Pertemuan dengan fasilitas aula terpadu.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-700">Keterangan Kapasitas & Spesifikasi Singkat</label>
               <input
                 type="text"
-                placeholder="Contoh: 50 Kamar Hunian AC & Kamar Mandi Dalam"
+                placeholder={category === 'SERBAGUNA' ? 'Contoh: Kapasitas 500 - 1000 Orang (AC Central, Videotron)' : 'Contoh: 50 Kamar Hunian AC & Kamar Mandi Dalam'}
                 value={capacityDesc}
                 onChange={e => setCapacityDesc(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
@@ -636,19 +678,37 @@ export function RoomModal({ isOpen, onClose, roomToEdit }: RoomModalProps) {
 
   const canManage = currentUser && (isSuperAdmin(currentUser.role) || currentUser.role === 'Admin' || isRecepRole(currentUser.role));
 
+  const selectedBuilding = buildings.find(b => b.name === building);
+  const isSerbagunaRoom = selectedBuilding?.category === 'SERBAGUNA' || building === 'Ruang Pertemuan' || type === 'Ruang Pertemuan / Aula';
+
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
-        <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white p-4 flex items-center justify-between">
+        <div className={`bg-gradient-to-r ${
+          isSerbagunaRoom 
+            ? 'from-slate-900 via-purple-950 to-slate-900' 
+            : 'from-slate-900 via-blue-950 to-slate-900'
+        } text-white p-4 flex items-center justify-between transition-colors`}>
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-400/30 flex items-center justify-center">
-              <i className="fa-solid fa-bed"></i>
+            <div className={`w-8 h-8 rounded-lg ${
+              isSerbagunaRoom
+                ? 'bg-purple-500/20 text-purple-400 border border-purple-400/30'
+                : 'bg-blue-500/20 text-blue-400 border border-blue-400/30'
+            } flex items-center justify-center`}>
+              <i className={`fa-solid ${isSerbagunaRoom ? 'fa-landmark' : 'fa-bed'}`}></i>
             </div>
             <div>
-              <h3 className="font-bold text-sm text-white">
-                {isEdit ? 'Edit Data Kamar' : 'Input Kamar Baru'}
+              <h3 className="font-bold text-sm text-white flex items-center space-x-2">
+                <span>{isEdit ? (isSerbagunaRoom ? 'Edit Ruang Pertemuan' : 'Edit Data Kamar') : (isSerbagunaRoom ? 'Input Ruang Pertemuan' : 'Input Kamar Baru')}</span>
+                {isSerbagunaRoom && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 font-semibold border border-purple-400/30">
+                    Aula / Serbaguna
+                  </span>
+                )}
               </h3>
-              <p className="text-[10px] text-blue-200">Manajemen Fasilitas Hunian UPT Asrama Haji</p>
+              <p className="text-[10px] text-blue-200">
+                {isSerbagunaRoom ? 'Pangkalan Data Fasilitas Ruang Pertemuan & Aula' : 'Manajemen Fasilitas Hunian UPT Asrama Haji'}
+              </p>
             </div>
           </div>
           <button 
@@ -678,13 +738,27 @@ export function RoomModal({ isOpen, onClose, roomToEdit }: RoomModalProps) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-5 space-y-3.5 max-h-[80vh] overflow-y-auto custom-scrollbar">
+            {isSerbagunaRoom && (
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl flex items-start space-x-2.5 text-xs text-purple-900">
+                <i className="fa-solid fa-landmark text-purple-600 text-sm mt-0.5 shrink-0"></i>
+                <div>
+                  <span className="font-bold block text-purple-950">Sinkronisasi Katalog Ruang Pertemuan Terpadu</span>
+                  <p className="text-[11px] text-purple-800 leading-relaxed">
+                    Unit ini terhubung dengan <strong>Katalog Ruang Pertemuan</strong> dan <strong>Denah Kamar Dan Ruang Pertemuan</strong>. Perubahan nama, status, atau fasilitas akan langsung tercermin di kedua modul.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Nomor Kamar *</label>
+                <label className="text-xs font-bold text-slate-700">
+                  {isSerbagunaRoom ? 'Nama / No Ruangan *' : 'Nomor Kamar *'}
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="Contoh: A101"
+                  placeholder={isSerbagunaRoom ? 'Contoh: Aula Serbaguna 1' : 'Contoh: A101'}
                   value={roomNumber}
                   onChange={e => setRoomNumber(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -708,22 +782,38 @@ export function RoomModal({ isOpen, onClose, roomToEdit }: RoomModalProps) {
               <label className="text-xs font-bold text-slate-700">Gedung / Kompleks</label>
               <select
                 value={building}
-                onChange={e => setBuilding(e.target.value)}
+                onChange={e => {
+                  const bName = e.target.value;
+                  setBuilding(bName);
+                  const bObj = buildings.find(b => b.name === bName);
+                  if (bObj?.category === 'SERBAGUNA' || bName === 'Ruang Pertemuan') {
+                    setType('Ruang Pertemuan / Aula');
+                    if (capacity <= 6) setCapacity(500);
+                    if (pricePerNight <= 1000000) setPricePerNight(8500000);
+                    if (facilitiesText.includes('4 Single Bed')) {
+                      setFacilitiesText('AC Central, Sound System 5000W, Proyektor & Videotron, Kursi VIP & Seminar, Podium Pidato, Ruang Rias & Toilet VIP');
+                    }
+                  }
+                }}
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 {buildings.map(b => (
-                  <option key={b.id} value={b.name}>{b.name}</option>
+                  <option key={b.id} value={b.name}>
+                    {b.name} {b.category === 'SERBAGUNA' ? '(Serbaguna / Aula)' : ''}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Kapasitas (Orang)</label>
+                <label className="text-xs font-bold text-slate-700">
+                  {isSerbagunaRoom ? 'Kapasitas Peserta (Orang)' : 'Kapasitas (Orang)'}
+                </label>
                 <input
                   type="number"
                   min={1}
-                  max={20}
+                  max={2000}
                   value={capacity}
                   onChange={e => setCapacity(parseInt(e.target.value) || 1)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
@@ -731,23 +821,36 @@ export function RoomModal({ isOpen, onClose, roomToEdit }: RoomModalProps) {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Tipe Kamar</label>
+                <label className="text-xs font-bold text-slate-700">Tipe Fasilitas</label>
                 <select
                   value={type}
-                  onChange={e => setType(e.target.value)}
+                  onChange={e => {
+                    const newType = e.target.value;
+                    setType(newType);
+                    if (newType === 'Ruang Pertemuan / Aula') {
+                      if (capacity <= 6) setCapacity(500);
+                      if (pricePerNight <= 1000000) setPricePerNight(8500000);
+                      if (facilitiesText.includes('4 Single Bed')) {
+                        setFacilitiesText('AC Central, Sound System 5000W, Proyektor & Videotron, Kursi VIP & Seminar, Podium Pidato, Ruang Rias & Toilet VIP');
+                      }
+                    }
+                  }}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 >
                   <option key="Standar" value="Standar">Standar (Haji / Reguler)</option>
                   <option key="VIP" value="VIP">VIP</option>
                   <option key="Family" value="Family">Keluarga</option>
                   <option key="Asrama" value="Asrama">Asrama / Barak</option>
+                  <option key="Ruang Pertemuan / Aula" value="Ruang Pertemuan / Aula">Ruang Pertemuan / Aula</option>
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Tarif per Malam (Rp)</label>
+                <label className="text-xs font-bold text-slate-700">
+                  {isSerbagunaRoom ? 'Tarif Sewa per Sesi/Hari (Rp)' : 'Tarif per Malam (Rp)'}
+                </label>
                 <input
                   type="number"
                   step={50000}
@@ -758,25 +861,27 @@ export function RoomModal({ isOpen, onClose, roomToEdit }: RoomModalProps) {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-700">Status Kamar</label>
+                <label className="text-xs font-bold text-slate-700">Status Operasional</label>
                 <select
                   value={status}
                   onChange={e => setStatus(e.target.value as any)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 >
-                  <option key="KOSONG" value="KOSONG">Kosong (Tersedia)</option>
-                  <option key="TERISI" value="TERISI">Terisi (Check-In)</option>
-                  <option key="BOOKED" value="BOOKED">Booked (Reservasi)</option>
+                  <option key="KOSONG" value="KOSONG">{isSerbagunaRoom ? 'Tersedia (Dapat Disewa)' : 'Kosong (Tersedia)'}</option>
+                  <option key="TERISI" value="TERISI">{isSerbagunaRoom ? 'Terpakai / Berlangsung Acara' : 'Terisi (Check-In)'}</option>
+                  <option key="BOOKED" value="BOOKED">Booked (Reservasi Acara)</option>
                   <option key="MAINTENANCE" value="MAINTENANCE">Maintenance</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-slate-700">Fasilitas Kamar (Pisahkan dengan koma)</label>
+              <label className="text-xs font-bold text-slate-700">
+                {isSerbagunaRoom ? 'Fasilitas Aula / Ruang Rapat (Pisahkan dengan koma)' : 'Fasilitas Kamar (Pisahkan dengan koma)'}
+              </label>
               <input
                 type="text"
-                placeholder="AC, Kamar Mandi Dalam, 4 Single Bed, Lemari"
+                placeholder={isSerbagunaRoom ? 'AC Central, Sound System 5000W, Videotron, Kursi VIP...' : 'AC, Kamar Mandi Dalam, 4 Single Bed...'}
                 value={facilitiesText}
                 onChange={e => setFacilitiesText(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600"

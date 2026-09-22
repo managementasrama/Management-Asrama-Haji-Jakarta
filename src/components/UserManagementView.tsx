@@ -283,33 +283,33 @@ export function UserManagementView() {
   // Role Badges & Colors Helper
   const getRoleBadge = (role: string) => {
     if (role === 'Super Admin') {
-      return { bg: 'bg-purple-100 text-purple-900 border-purple-300', icon: 'fa-crown', label: 'Super Admin' };
+      return { bg: 'bg-purple-100 dark:bg-purple-950/70 text-purple-900 dark:text-purple-200 border-purple-300 dark:border-purple-600', icon: 'fa-crown', label: 'Super Admin' };
     }
     if (role === 'Admin') {
-      return { bg: 'bg-indigo-100 text-indigo-900 border-indigo-300', icon: 'fa-shield-halved', label: 'Admin Sistem' };
+      return { bg: 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-900 dark:text-indigo-200 border-indigo-300 dark:border-indigo-600', icon: 'fa-shield-halved', label: 'Admin Sistem' };
     }
     if (role === 'Manager Resepsionis') {
-      return { bg: 'bg-blue-100 text-blue-900 border-blue-300', icon: 'fa-user-tie', label: 'Manager Pelayanan' };
+      return { bg: 'bg-blue-100 dark:bg-blue-950/70 text-blue-900 dark:text-blue-200 border-blue-300 dark:border-blue-600', icon: 'fa-user-tie', label: 'Manager Pelayanan' };
     }
     if (role === 'Resepsionis') {
-      return { bg: 'bg-sky-100 text-sky-800 border-sky-300', icon: 'fa-bell-concierge', label: 'Resepsionis' };
+      return { bg: 'bg-sky-100 dark:bg-sky-950/70 text-sky-900 dark:text-sky-200 border-sky-300 dark:border-sky-600', icon: 'fa-bell-concierge', label: 'Resepsionis' };
     }
     if (role === 'Manager QC') {
-      return { bg: 'bg-teal-100 text-teal-900 border-teal-300', icon: 'fa-clipboard-check', label: 'Manager QC' };
+      return { bg: 'bg-teal-100 dark:bg-teal-950/70 text-teal-900 dark:text-teal-200 border-teal-300 dark:border-teal-600', icon: 'fa-clipboard-check', label: 'Manager QC' };
     }
     if (role === 'Quality Control') {
-      return { bg: 'bg-teal-50 text-teal-800 border-teal-200', icon: 'fa-magnifying-glass-check', label: 'Staf QC' };
+      return { bg: 'bg-teal-50 dark:bg-teal-950/60 text-teal-900 dark:text-teal-200 border-teal-200 dark:border-teal-600', icon: 'fa-magnifying-glass-check', label: 'Staf QC' };
     }
     if (role === 'Manager Teknisi') {
-      return { bg: 'bg-amber-100 text-amber-900 border-amber-300', icon: 'fa-wrench', label: 'Manager Fasilitas' };
+      return { bg: 'bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-600', icon: 'fa-wrench', label: 'Manager Fasilitas' };
     }
     if (role === 'Teknisi') {
-      return { bg: 'bg-amber-50 text-amber-800 border-amber-200', icon: 'fa-screwdriver-wrench', label: 'Teknisi Lapangan' };
+      return { bg: 'bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border-amber-200 dark:border-amber-600', icon: 'fa-screwdriver-wrench', label: 'Teknisi Lapangan' };
     }
     if (role === 'Manager Koperasi') {
-      return { bg: 'bg-emerald-100 text-emerald-900 border-emerald-300', icon: 'fa-store', label: 'Manager Konsumsi' };
+      return { bg: 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-600', icon: 'fa-store', label: 'Manager Konsumsi' };
     }
-    return { bg: 'bg-emerald-50 text-emerald-800 border-emerald-200', icon: 'fa-utensils', label: 'Petugas Koperasi' };
+    return { bg: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-600', icon: 'fa-utensils', label: 'Petugas Koperasi' };
   };
 
   // Export List as CSV
@@ -1098,33 +1098,33 @@ export function UserManagementView() {
         </div>
       ) : viewMode === 'TABLE' ? (
         /* TABLE VIEW */
-        <div className="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
-          <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
             <div className="flex items-center space-x-2">
-              <span className="font-bold text-slate-800 text-xs">
+              <span className="font-bold text-slate-800 dark:text-slate-100 text-xs">
                 Menampilkan {filteredUsers.length} dari {users.length} Petugas
               </span>
             </div>
-            <span className="text-[11px] text-slate-500">
-              Klik nama atau tombol aksi untuk mengubah wewenang & status akun.
+            <span className="text-[11px] text-slate-600 dark:text-slate-100 font-medium">
+              Klik nama atau tombol aksi untuk mengubah wewenang &amp; status akun.
             </span>
           </div>
 
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50/80 text-slate-600 font-bold border-b border-slate-200 text-[11px] uppercase tracking-wider">
-                  <th className="py-3 px-4">Petugas</th>
-                  <th className="py-3 px-4">Jabatan & Divisi</th>
-                  <th className="py-3 px-4">Penugasan Gedung</th>
-                  <th className="py-3 px-4">Atasan Langsung</th>
-                  <th className="py-3 px-4">Kontak HP</th>
-                  <th className="py-3 px-4">Kata Sandi</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-right">Aksi & Kelola</th>
+                <tr className="bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-100 font-bold border-b border-slate-200 dark:border-slate-700 text-[11px] uppercase tracking-wider">
+                  <th className="py-3 px-4 text-slate-700 dark:text-slate-100">Petugas</th>
+                  <th className="py-3 px-4 text-slate-700 dark:text-slate-100">Jabatan &amp; Divisi</th>
+                  <th className="py-3 px-4 text-slate-700 dark:text-slate-100">Penugasan Gedung</th>
+                  <th className="py-3 px-4 text-slate-700 dark:text-slate-100">Atasan Langsung</th>
+                  <th className="py-3 px-4 text-slate-700 dark:text-slate-100">Kontak HP</th>
+                  <th className="py-3 px-4 text-slate-700 dark:text-slate-100">Kata Sandi</th>
+                  <th className="py-3 px-4 text-center text-slate-700 dark:text-slate-100">Status</th>
+                  <th className="py-3 px-4 text-right text-slate-700 dark:text-slate-100">Aksi &amp; Kelola</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {filteredUsers.map(user => {
                   const badge = getRoleBadge(user.role);
                   const supervisor = users.find(u => u.id === user.supervisorId);
@@ -1132,7 +1132,7 @@ export function UserManagementView() {
                   const isMainAdmin = user.username.toLowerCase() === 'admin';
 
                   return (
-                    <tr key={user.id} className="hover:bg-slate-50/70 transition-colors">
+                    <tr key={user.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-700/40 transition-colors">
                       {/* Petugas info */}
                       <td className="py-3 px-4">
                         <div className="flex items-center space-x-3">
@@ -1146,26 +1146,26 @@ export function UserManagementView() {
                             }`}>
                               {user.fullName.charAt(0).toUpperCase()}
                             </div>
-                            <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
+                            <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-800 ${
                               user.status === 'Aktif' ? 'bg-emerald-500' : 'bg-slate-400'
                             }`}></span>
                           </div>
 
                           <div>
                             <div className="flex items-center space-x-1.5 flex-wrap">
-                              <span className="font-bold text-slate-900">{user.fullName}</span>
+                              <span className="font-bold text-slate-900 dark:text-slate-100">{user.fullName}</span>
                               {isCurrent && (
-                                <span className="bg-emerald-100 text-emerald-800 text-[9px] font-black px-1.5 py-0.2 rounded border border-emerald-300">
+                                <span className="bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 text-[9px] font-black px-1.5 py-0.2 rounded border border-emerald-300 dark:border-emerald-700">
                                   Akun Anda
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center space-x-2 text-[11px] text-slate-500 mt-0.5">
-                              <span className="font-mono">@{user.username}</span>
+                            <div className="flex items-center space-x-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                              <span className="font-mono text-slate-600 dark:text-slate-300">@{user.username}</span>
                               {user.email && (
                                 <>
                                   <span>•</span>
-                                  <span className="text-slate-600 font-mono text-[10px]">
+                                  <span className="text-slate-600 dark:text-slate-300 font-mono text-[10px]">
                                     {user.email}
                                   </span>
                                 </>
@@ -1182,24 +1182,24 @@ export function UserManagementView() {
                             <i className={`fa-solid ${badge.icon}`}></i>
                             <span>{user.role}</span>
                           </span>
-                          <p className="text-[11px] text-slate-500">{user.department || 'Pelayanan'}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">{user.department || 'Pelayanan'}</p>
                         </div>
                       </td>
 
                       {/* Penugasan Gedung */}
                       <td className="py-3 px-4">
-                        <span className="text-slate-700 font-medium">{user.assignedBuilding || 'Semua Gedung'}</span>
+                        <span className="text-slate-700 dark:text-slate-200 font-medium">{user.assignedBuilding || 'Semua Gedung'}</span>
                       </td>
 
                       {/* Atasan Langsung */}
                       <td className="py-3 px-4">
                         {supervisor ? (
                           <div>
-                            <p className="font-semibold text-slate-800">{supervisor.fullName}</p>
-                            <span className="text-[10px] text-slate-500">{supervisor.role}</span>
+                            <p className="font-semibold text-slate-800 dark:text-slate-100">{supervisor.fullName}</p>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400">{supervisor.role}</span>
                           </div>
                         ) : (
-                          <span className="text-slate-400 italic text-[11px]">- (Puncak Hirarki)</span>
+                          <span className="text-slate-400 dark:text-slate-500 italic text-[11px]">- (Puncak Hirarki)</span>
                         )}
                       </td>
 
@@ -1210,21 +1210,21 @@ export function UserManagementView() {
                             href={`https://wa.me/${user.phone.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-slate-700 hover:text-emerald-700 font-medium flex items-center space-x-1"
+                            className="text-slate-700 dark:text-slate-200 hover:text-emerald-700 dark:hover:text-emerald-400 font-medium flex items-center space-x-1"
                             title="Chat WhatsApp"
                           >
-                            <i className="fa-brands fa-whatsapp text-emerald-600"></i>
+                            <i className="fa-brands fa-whatsapp text-emerald-600 dark:text-emerald-400"></i>
                             <span>{user.phone}</span>
                           </a>
                         ) : (
-                          <span className="text-slate-400">-</span>
+                          <span className="text-slate-400 dark:text-slate-500">-</span>
                         )}
                       </td>
 
                       {/* Kata Sandi */}
                       <td className="py-3 px-4">
                         <div className="flex items-center space-x-1.5">
-                          <code className="text-slate-600 font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">
+                          <code className="text-slate-700 dark:text-slate-200 font-mono bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[11px] border border-slate-200 dark:border-slate-600">
                             {user.password || '12345'}
                           </code>
                           <button
@@ -1233,7 +1233,7 @@ export function UserManagementView() {
                               setPwdTargetUser(user);
                               setNewPasswordVal(user.password || '12345');
                             }}
-                            className="text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-200 transition cursor-pointer"
+                            className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
                             title="Ubah Kata Sandi Petugas"
                           >
                             <i className="fa-solid fa-key text-[10px]"></i>
@@ -1372,7 +1372,7 @@ export function UserManagementView() {
             return (
               <div 
                 key={user.id}
-                className="bg-white rounded-2xl p-5 shadow-xs border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all space-y-3.5 flex flex-col justify-between"
+                className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-xs border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-sm transition-all space-y-3.5 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
@@ -1387,21 +1387,21 @@ export function UserManagementView() {
                         }`}>
                           {user.fullName.charAt(0).toUpperCase()}
                         </div>
-                        <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                        <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white dark:border-slate-800 ${
                           user.status === 'Aktif' ? 'bg-emerald-500' : 'bg-slate-400'
                         }`}></span>
                       </div>
 
                       <div>
-                        <h4 className="font-bold text-slate-900 text-sm leading-tight flex items-center gap-1.5">
+                        <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-tight flex items-center gap-1.5">
                           <span>{user.fullName}</span>
                         </h4>
-                        <span className="text-slate-500 font-mono text-xs">@{user.username}</span>
+                        <span className="text-slate-500 dark:text-slate-300 font-mono text-xs">@{user.username}</span>
                       </div>
                     </div>
 
                     {user.status === 'Menunggu Persetujuan' ? (
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full border bg-amber-50 text-amber-800 border-amber-300 animate-pulse">
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full border bg-amber-50 dark:bg-amber-950/70 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-600 animate-pulse">
                         MENUNGGU ACC
                       </span>
                     ) : (
@@ -1411,8 +1411,8 @@ export function UserManagementView() {
                         disabled={isMainAdmin || isCurrent}
                         className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${
                           user.status === 'Aktif'
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                            : 'bg-slate-100 text-slate-500 border-slate-300'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-200 border-emerald-300 dark:border-emerald-600'
+                            : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 border-slate-300 dark:border-slate-600'
                         } ${isMainAdmin || isCurrent ? 'opacity-70' : 'cursor-pointer hover:bg-opacity-80'}`}
                       >
                         {user.status}
@@ -1420,9 +1420,9 @@ export function UserManagementView() {
                     )}
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-600">
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400 text-[11px]">Peran:</span>
+                      <span className="text-slate-400 dark:text-slate-400 text-[11px]">Peran:</span>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${badge.bg}`}>
                         <i className={`fa-solid ${badge.icon} mr-1`}></i>
                         {user.role}
@@ -1430,23 +1430,23 @@ export function UserManagementView() {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400 text-[11px]">Penugasan:</span>
-                      <span className="font-semibold text-slate-800 text-[11px] truncate max-w-[170px]">
+                      <span className="text-slate-400 dark:text-slate-400 text-[11px]">Penugasan:</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-100 text-[11px] truncate max-w-[170px]">
                         {user.assignedBuilding || 'Semua Gedung'}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400 text-[11px]">Atasan:</span>
-                      <span className="text-slate-700 text-[11px] truncate max-w-[170px]">
+                      <span className="text-slate-400 dark:text-slate-400 text-[11px]">Atasan:</span>
+                      <span className="text-slate-700 dark:text-slate-200 text-[11px] truncate max-w-[170px]">
                         {supervisor ? supervisor.fullName : '-'}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400 text-[11px]">Kata Sandi:</span>
+                      <span className="text-slate-400 dark:text-slate-400 text-[11px]">Kata Sandi:</span>
                       <div className="flex items-center space-x-1">
-                        <code className="font-mono bg-slate-100 px-1.5 py-0.2 rounded text-[11px] text-slate-700">
+                        <code className="font-mono bg-slate-100 dark:bg-slate-700 px-1.5 py-0.2 rounded text-[11px] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600">
                           {user.password || '12345'}
                         </code>
                         <button
@@ -1455,7 +1455,7 @@ export function UserManagementView() {
                             setPwdTargetUser(user);
                             setNewPasswordVal(user.password || '12345');
                           }}
-                          className="text-slate-400 hover:text-slate-700 cursor-pointer"
+                          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
                           title="Ganti Password"
                         >
                           <i className="fa-solid fa-key text-[10px]"></i>
@@ -1556,22 +1556,22 @@ export function UserManagementView() {
 
       {/* 5. QUICK PASSWORD MODAL */}
       {pwdTargetUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
               <div className="flex items-center space-x-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-base">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold text-base">
                   <i className="fa-solid fa-key"></i>
                 </div>
                 <div>
-                  <h4 className="font-black text-slate-900 text-sm">Ganti Kata Sandi Petugas</h4>
-                  <p className="text-[11px] text-slate-500">{pwdTargetUser.fullName} (@{pwdTargetUser.username})</p>
+                  <h4 className="font-black text-slate-900 dark:text-slate-100 text-sm">Ganti Kata Sandi Petugas</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-300">{pwdTargetUser.fullName} (@{pwdTargetUser.username})</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setPwdTargetUser(null)}
-                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
               >
                 <i className="fa-solid fa-xmark"></i>
               </button>
@@ -1579,7 +1579,7 @@ export function UserManagementView() {
 
             <form onSubmit={handleSaveQuickPassword} className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
                   Masukkan Kata Sandi Baru
                 </label>
                 <input
@@ -1588,18 +1588,18 @@ export function UserManagementView() {
                   placeholder="Contoh: 12345 atau SandiBaru123"
                   value={newPasswordVal}
                   onChange={e => setNewPasswordVal(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-hajj-600 focus:bg-white"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-hajj-600 focus:bg-white dark:focus:bg-slate-900"
                 />
-                <p className="text-[10px] text-slate-500 mt-1">
+                <p className="text-[10px] text-slate-500 dark:text-slate-300 mt-1">
                   Petugas akan menggunakan kata sandi baru ini untuk login berikutnya.
                 </p>
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={() => setPwdTargetUser(null)}
-                  className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                  className="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition cursor-pointer"
                 >
                   Batal
                 </button>
@@ -1618,27 +1618,27 @@ export function UserManagementView() {
 
       {/* 6. IN-APP CONFIRMATION ACTION MODAL (SAFE FROM IFRAME RESTRICTIONS) */}
       {confirmActionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-rose-200 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-rose-200 dark:border-rose-900/50 space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-11 h-11 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-lg shrink-0">
+              <div className="w-11 h-11 rounded-xl bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold text-lg shrink-0">
                 <i className="fa-solid fa-triangle-exclamation"></i>
               </div>
               <div>
-                <h4 className="font-black text-slate-900 text-sm leading-snug">{confirmActionModal.title}</h4>
-                <p className="text-xs font-mono text-slate-500">@{confirmActionModal.targetUsername} • {confirmActionModal.targetName}</p>
+                <h4 className="font-black text-slate-900 dark:text-slate-100 text-sm leading-snug">{confirmActionModal.title}</h4>
+                <p className="text-xs font-mono text-slate-500 dark:text-slate-300">@{confirmActionModal.targetUsername} • {confirmActionModal.targetName}</p>
               </div>
             </div>
 
-            <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs text-slate-600 leading-relaxed">
+            <div className="bg-slate-50 dark:bg-slate-900/80 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-200 leading-relaxed">
               {confirmActionModal.description}
             </div>
 
-            <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100 dark:border-slate-700">
               <button
                 type="button"
                 onClick={() => setConfirmActionModal(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition cursor-pointer"
               >
                 Batal
               </button>

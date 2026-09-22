@@ -41,6 +41,7 @@ export function FloatingChatPanel() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chatPanelRef = useRef<HTMLDivElement>(null);
 
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -49,6 +50,32 @@ export function FloatingChatPanel() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Otomatis tutup chat saat klik di luar panel chat
+  useEffect(() => {
+    if (!isChatOpen) return;
+
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      // Jika modal sub-dialog chat sedang terbuka, jangan tutup panel
+      if (isNewChatModalOpen || showGroupInfoModal || showClearConfirmModal) return;
+
+      const target = event.target as Node;
+      if (chatPanelRef.current && !chatPanelRef.current.contains(target)) {
+        // Abaikan jika klik terjadi pada tombol floating launcher
+        const launcher = document.getElementById('floating-chat-launcher');
+        if (launcher && launcher.contains(target)) return;
+        closeChat();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isChatOpen, isNewChatModalOpen, showGroupInfoModal, showClearConfirmModal, closeChat]);
 
   const isAnyChatModalOpen = isNewChatModalOpen || showGroupInfoModal || showClearConfirmModal || (isChatOpen && isMobile);
   useBodyScrollLock(isAnyChatModalOpen);
@@ -255,6 +282,7 @@ export function FloatingChatPanel() {
       {/* 3. PROFESSIONAL TEAM CHAT & COORDINATION PANEL */}
       {isChatOpen && (
         <div 
+          ref={chatPanelRef}
           id="floating-chat-modal"
           className="fixed bottom-0 right-0 sm:bottom-5 sm:right-6 z-50 w-full sm:w-[440px] h-[100dvh] sm:h-[620px] sm:max-h-[90vh] bg-white sm:rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
         >

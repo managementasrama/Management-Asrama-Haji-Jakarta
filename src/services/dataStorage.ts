@@ -466,16 +466,116 @@ export class DataStorageService {
       id: building.id && building.id.trim() !== '' ? building.id : `bld-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`
     };
     const idx = buildings.findIndex(b => b.id === buildingWithId.id);
-    let updated: Building[];
+    let updatedBuildings: Building[];
+    let rooms = db.rooms || [];
+    let transactions = db.transactions || [];
+    let maintenances = db.maintenances || [];
+    let qcInspections = db.qcInspections || [];
+    let users = db.users || [];
+    let meetingRooms = db.meetingRooms || [];
 
     if (idx >= 0) {
-      updated = [...buildings];
-      updated[idx] = { ...updated[idx], ...buildingWithId };
+      const oldBuilding = buildings[idx];
+      updatedBuildings = [...buildings];
+      updatedBuildings[idx] = { ...updatedBuildings[idx], ...buildingWithId };
+
+      // Jika nama gedung berubah, sinkronkan semua kamar, transaksi, perawatan, qc, meeting rooms, dan pengguna!
+      if (oldBuilding.name !== buildingWithId.name) {
+        rooms = rooms.map(r => r.building === oldBuilding.name ? { ...r, building: buildingWithId.name } : r);
+        meetingRooms = meetingRooms.map(m => 
+          m.building === oldBuilding.name || m.name === oldBuilding.name
+            ? { ...m, building: buildingWithId.name, name: m.name === oldBuilding.name ? buildingWithId.name : m.name }
+            : m
+        );
+        transactions = transactions.map(t => t.building === oldBuilding.name ? { ...t, building: buildingWithId.name } : t);
+        maintenances = maintenances.map(m => m.building === oldBuilding.name ? { ...m, building: buildingWithId.name } : m);
+        qcInspections = qcInspections.map(q => q.building === oldBuilding.name ? { ...q, building: buildingWithId.name } : q);
+        users = users.map(u => u.assignedBuilding === oldBuilding.name ? { ...u, assignedBuilding: buildingWithId.name } : u);
+      }
     } else {
-      updated = [...buildings, buildingWithId];
+      updatedBuildings = [...buildings, buildingWithId];
+
+      // Saat membuat gedung baru, buatkan unit kamar awal otomatis sesuai jumlah totalRooms
+      const requestedRooms = Number(buildingWithId.totalRooms) || 0;
+      if (requestedRooms > 0) {
+        const floors = Math.max(1, Number(buildingWithId.floors) || 1);
+        const roomsPerFloor = Math.ceil(requestedRooms / floors);
+        const newRooms: Room[] = [];
+        let count = 0;
+        for (let f = 1; f <= floors; f++) {
+          for (let r = 1; r <= roomsPerFloor && count < requestedRooms; r++) {
+            count++;
+            const roomNum = `${f}${r.toString().padStart(2, '0')}`;
+            newRooms.push({
+              id: `room-${Date.now()}-${f}-${r}-${Math.random().toString(36).substr(2, 4)}`,
+              building: buildingWithId.name,
+              roomNumber: roomNum,
+              floor: f,
+              type: buildingWithId.category === 'SERBAGUNA' ? 'Ruang Pertemuan / Aula' : 'Standar (4 Bed)',
+              capacity: buildingWithId.category === 'SERBAGUNA' ? '500 Orang' : '4 Orang',
+              pricePerNight: buildingWithId.category === 'SERBAGUNA' ? 8500000 : 400000,
+              facilities: buildingWithId.category === 'SERBAGUNA' 
+                ? ['AC Central', 'Sound System 5000W', 'Proyektor & Videotron', 'Kursi VIP & Seminar', 'Podium Pidato', 'Ruang Rias & Toilet VIP']
+                : ['AC', 'Kamar Mandi Dalam', '4 Single Bed', 'Lemari Pakaian', 'Water Heater'],
+              status: 'KOSONG',
+              qcStatus: 'LOLOS_QC',
+              activeTxId: null,
+              activeMaintId: null
+            });
+          }
+        }
+        rooms = [...rooms, ...newRooms];
+      }
     }
 
-    this.saveDatabase({ ...db, buildings: updated });
+    // Jika kategori gedung adalah SERBAGUNA, sinkronkan otomatis ke Katalog Ruang Pertemuan (meetingRooms)
+    if (buildingWithId.category === 'SERBAGUNA') {
+      const mrIdx = meetingRooms.findIndex(m => 
+        m.id === `mr-${buildingWithId.id}` || 
+        m.name.toLowerCase() === buildingWithId.name.toLowerCase() ||
+        (m.building && m.building.toLowerCase() === buildingWithId.name.toLowerCase())
+      );
+
+      const mrData: MeetingRoom = {
+        id: mrIdx >= 0 ? meetingRooms[mrIdx].id : `mr-${buildingWithId.id}`,
+        name: buildingWithId.name,
+        code: buildingWithId.code || `AULA-${Date.now().toString().slice(-4)}`,
+        building: buildingWithId.name,
+        capacity: buildingWithId.capacityDesc || '500 - 1000 Orang',
+        capacityNumber: 500,
+        dailyRate: 15000000,
+        sessionRate: 8500000,
+        facilities: [
+          'AC Central',
+          'Sound System 5000W',
+          'Proyektor & Videotron',
+          'Kursi VIP & Seminar',
+          'Podium Pidato',
+          'Ruang Rias & Toilet VIP'
+        ],
+        description: buildingWithId.description || `Gedung Serbaguna & Ruang Pertemuan ${buildingWithId.name}`,
+        status: buildingWithId.status === 'AKTIF' ? 'TERSEDIA' : 'MAINTENANCE',
+        qcStatus: 'LOLOS_QC',
+        images: buildingWithId.images || []
+      };
+
+      if (mrIdx >= 0) {
+        meetingRooms[mrIdx] = { ...meetingRooms[mrIdx], ...mrData };
+      } else {
+        meetingRooms = [...meetingRooms, mrData];
+      }
+    }
+
+    this.saveDatabase({ 
+      ...db, 
+      buildings: updatedBuildings, 
+      rooms, 
+      transactions, 
+      maintenances, 
+      qcInspections, 
+      users,
+      meetingRooms
+    });
     return buildingWithId;
   }
 
@@ -498,7 +598,14 @@ export class DataStorageService {
     }
 
     const updated = buildings.filter(b => b.id !== buildingId);
-    this.saveDatabase({ ...db, buildings: updated });
+    // Hapus juga dari meetingRooms jika terdaftar sebagai aula serbaguna
+    const updatedMeetingRooms = (db.meetingRooms || []).filter(m => 
+      m.id !== `mr-${buildingId}` && 
+      m.building.toLowerCase() !== bld.name.toLowerCase() && 
+      m.name.toLowerCase() !== bld.name.toLowerCase()
+    );
+
+    this.saveDatabase({ ...db, buildings: updated, meetingRooms: updatedMeetingRooms });
     return { success: true, message: `Gedung '${bld.name}' berhasil dihapus dari database.` };
   }
 
@@ -596,15 +703,90 @@ export class DataStorageService {
     };
     const idx = rooms.findIndex(r => r.id === roomWithId.id);
     let updated: Room[];
+    let transactions = db.transactions || [];
+    let maintenances = db.maintenances || [];
+    let qcInspections = db.qcInspections || [];
+    let meetingRooms = db.meetingRooms || [];
 
     if (idx >= 0) {
+      const oldRoom = rooms[idx];
       updated = [...rooms];
       updated[idx] = { ...updated[idx], ...roomWithId };
+
+      if (oldRoom.roomNumber !== roomWithId.roomNumber || oldRoom.building !== roomWithId.building) {
+        transactions = transactions.map(t => 
+          t.roomId === roomWithId.id || (t.roomNumber === oldRoom.roomNumber && t.building === oldRoom.building)
+            ? { ...t, roomNumber: roomWithId.roomNumber, building: roomWithId.building }
+            : t
+        );
+        maintenances = maintenances.map(m =>
+          m.roomId === roomWithId.id || (m.roomNumber === oldRoom.roomNumber && m.building === oldRoom.building)
+            ? { ...m, roomNumber: roomWithId.roomNumber, building: roomWithId.building }
+            : m
+        );
+        qcInspections = qcInspections.map(q =>
+          q.roomId === roomWithId.id || (q.roomNumber === oldRoom.roomNumber && q.building === oldRoom.building)
+            ? { ...q, roomNumber: roomWithId.roomNumber, building: roomWithId.building }
+            : q
+        );
+      }
     } else {
       updated = [...rooms, roomWithId];
     }
 
-    this.saveDatabase({ ...db, rooms: updated });
+    // Sinkronkan totalRooms pada daftar gedung
+    const buildings = (db.buildings || []).map(b => {
+      const count = updated.filter(r => r.building === b.name).length;
+      return { ...b, totalRooms: count };
+    });
+
+    // Sinkronkan ke meetingRooms jika kamar/gedung ini berkategori Serbaguna / Aula
+    const targetBuilding = buildings.find(b => b.name.toLowerCase() === roomWithId.building.toLowerCase());
+    const isSerbaguna = targetBuilding?.category === 'SERBAGUNA' || 
+                        roomWithId.building === 'Ruang Pertemuan' || 
+                        (roomWithId.type && (roomWithId.type.toLowerCase().includes('aula') || roomWithId.type.toLowerCase().includes('pertemuan') || roomWithId.type.toLowerCase().includes('serbaguna')));
+
+    if (isSerbaguna) {
+      const mrIdx = meetingRooms.findIndex(m => 
+        m.id === roomWithId.id || 
+        m.id === `mr-${roomWithId.id}` || 
+        (m.name.toLowerCase() === roomWithId.roomNumber.toLowerCase() && m.building?.toLowerCase() === roomWithId.building.toLowerCase())
+      );
+      const mrStatus = roomWithId.status === 'MAINTENANCE' ? 'MAINTENANCE' : (roomWithId.status === 'TERISI' ? 'TERPAKAI' : 'TERSEDIA');
+      
+      const mrData: MeetingRoom = {
+        id: mrIdx >= 0 ? meetingRooms[mrIdx].id : (roomWithId.id.startsWith('mr-') ? roomWithId.id : `mr-${roomWithId.id}`),
+        name: roomWithId.roomNumber,
+        code: `MR-${roomWithId.roomNumber}`,
+        building: roomWithId.building,
+        capacity: roomWithId.capacity ? `${roomWithId.capacity} Orang` : '500 Orang',
+        capacityNumber: parseInt(String(roomWithId.capacity)) || 300,
+        dailyRate: (roomWithId.pricePerNight && roomWithId.pricePerNight > 1000000) ? roomWithId.pricePerNight * 2 : 12000000,
+        sessionRate: roomWithId.pricePerNight || 6500000,
+        facilities: roomWithId.facilities && roomWithId.facilities.length > 0 
+          ? roomWithId.facilities 
+          : ['AC Central', 'Sound System 5000W', 'Proyektor & Videotron', 'Kursi VIP & Seminar', 'Podium Pidato', 'Ruang Rias & Toilet VIP'],
+        description: `Ruang pertemuan serbaguna ${roomWithId.roomNumber} di ${roomWithId.building}`,
+        status: mrStatus,
+        qcStatus: roomWithId.qcStatus || 'LOLOS_QC'
+      };
+
+      if (mrIdx >= 0) {
+        meetingRooms[mrIdx] = { ...meetingRooms[mrIdx], ...mrData };
+      } else {
+        meetingRooms = [...meetingRooms, mrData];
+      }
+    }
+
+    this.saveDatabase({ 
+      ...db, 
+      rooms: updated, 
+      buildings, 
+      transactions, 
+      maintenances, 
+      qcInspections,
+      meetingRooms
+    });
     return roomWithId;
   }
 
@@ -621,7 +803,21 @@ export class DataStorageService {
     }
 
     const updatedRooms = rooms.filter(r => r.id !== roomId);
-    this.saveDatabase({ ...db, rooms: updatedRooms });
+    
+    // Sinkronkan totalRooms pada daftar gedung
+    const buildings = (db.buildings || []).map(b => {
+      const count = updatedRooms.filter(r => r.building === b.name).length;
+      return { ...b, totalRooms: count };
+    });
+
+    // Sinkronkan penghapusan dari meetingRooms jika ada
+    const updatedMeetingRooms = (db.meetingRooms || []).filter(m => 
+      m.id !== roomId && 
+      m.id !== `mr-${roomId}` && 
+      !(m.name.toLowerCase() === room.roomNumber.toLowerCase() && m.building.toLowerCase() === room.building.toLowerCase())
+    );
+
+    this.saveDatabase({ ...db, rooms: updatedRooms, buildings, meetingRooms: updatedMeetingRooms });
     return { success: true, message: `Kamar ${room.roomNumber} (${room.building}) berhasil dihapus.` };
   }
 

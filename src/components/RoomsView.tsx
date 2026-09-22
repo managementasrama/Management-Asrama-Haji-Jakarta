@@ -91,15 +91,33 @@ export function RoomsView() {
   });
 
   const grouped: Record<string, Room[]> = {};
+  // Daftarkan semua master gedung dan Ruang Pertemuan agar selalu tersinkronkan
+  buildings.forEach(b => {
+    if (bFilter === 'ALL' || bFilter === b.name) {
+      if (!myZoneOnly || isRoomInUserZone(b.name)) {
+        grouped[b.name] = [];
+      }
+    }
+  });
+  if ((bFilter === 'ALL' || bFilter === 'Ruang Pertemuan') && (!myZoneOnly || isRoomInUserZone('Ruang Pertemuan'))) {
+    grouped['Ruang Pertemuan'] = [];
+  }
+
   filteredRooms.forEach(r => {
     if (!grouped[r.building]) grouped[r.building] = [];
     grouped[r.building].push(r);
   });
 
-  const buildingNames = Object.keys(grouped).sort((a, b) => {
+  const buildingNames = Object.keys(grouped).filter(bName => {
+    if (!search) return true;
+    if (grouped[bName].length > 0) return true;
+    return bName.toLowerCase().includes(search.toLowerCase());
+  }).sort((a, b) => {
     const idxA = BUILDING_ORDER.indexOf(a);
     const idxB = BUILDING_ORDER.indexOf(b);
     if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+    if (idxA !== -1) return -1;
+    if (idxB !== -1) return 1;
     return a.localeCompare(b);
   });
 
@@ -186,6 +204,15 @@ export function RoomsView() {
                 >
                   <i className="fa-solid fa-clock-rotate-left"></i>
                   <span>Telah Diperbaiki (Menunggu QC)</span>
+                </button>
+              ) : isRecep ? (
+                <button 
+                  onClick={() => openModal('modalCheckin', { roomId: room.id, actionType: 'BOOKING', initialDate: addDaysToDateStr(evalDate, 1) })} 
+                  className="w-full py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold rounded-lg text-xs border border-blue-200 flex items-center justify-center space-x-1.5 transition cursor-pointer"
+                  title="Booking aula untuk jadwal mendatang"
+                >
+                  <i className="fa-solid fa-calendar-plus text-blue-600"></i>
+                  <span>Booking Aula (Menunggu QC)</span>
                 </button>
               ) : (
                 <div className="w-full py-1 px-1.5 bg-purple-100 text-purple-900 rounded text-[10px] font-bold border border-purple-200 text-center">
@@ -447,10 +474,10 @@ export function RoomsView() {
                 <button 
                   onClick={() => openModal('modalCheckin', { roomId: room.id, actionType: 'BOOKING', initialDate: realTomorrowStr })} 
                   className="w-full py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold rounded-lg text-xs border border-blue-200 flex items-center justify-center space-x-1.5 transition cursor-pointer"
-                  title="Booking untuk tanggal besok / mendatang"
+                  title={isNeedQc ? "Booking kamar ini (Status: Perlu Cek QC)" : "Booking untuk tanggal besok / mendatang"}
                 >
                   <i className="fa-solid fa-calendar-plus text-blue-600"></i>
-                  <span>Booking Tgl Lain</span>
+                  <span>{isNeedQc ? 'Booking (Perlu Cek QC)' : 'Booking Tgl Lain'}</span>
                 </button>
               </div>
             );
@@ -914,7 +941,7 @@ export function RoomsView() {
             }`}
           >
             <i className="fa-solid fa-bed text-emerald-600"></i>
-            <span>Denah &amp; Kamar Hunian</span>
+            <span>Denah Kamar Dan Ruang Pertemuan</span>
             <span className="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded-full font-bold">
               {rooms.length}
             </span>
@@ -946,7 +973,7 @@ export function RoomsView() {
             }`}
           >
             <i className="fa-solid fa-landmark text-purple-600"></i>
-            <span>Katalog Ruang Pertemuan / Aula</span>
+            <span>Katalog Ruang Pertemuan</span>
             <span className="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded-full font-bold">
               {meetingRooms.length}
             </span>
@@ -1053,17 +1080,19 @@ export function RoomsView() {
               buildingNames.map(bName => {
                 const bRooms = grouped[bName];
                 const isCollapsed = isBuildingCollapsed(bName);
+                const bObj = buildings.find(b => b.name.toLowerCase() === bName.toLowerCase());
+                const isBldSerbaguna = bName === 'Ruang Pertemuan' || bObj?.category === 'SERBAGUNA';
                 return (
                   <div key={bName} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm space-y-3 transition">
                     {/* Building Header / Accordion Dropdown */}
                     <div 
                       onClick={() => toggleBuilding(bName)}
                       className="bg-slate-100 px-5 py-3 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer hover:bg-slate-200/75 transition select-none"
-                      title="Klik untuk menyembunyikan / menampilkan kamar"
+                      title="Klik untuk menyembunyikan / menampilkan kamar atau ruangan"
                     >
                       <div className="flex items-center space-x-3">
                         <div className={`w-9 h-9 rounded-xl ${
-                          bName === 'Ruang Pertemuan' 
+                          isBldSerbaguna 
                             ? 'bg-purple-700 text-white border border-purple-800 shadow-xs' 
                             : bName.includes('Arafah')
                             ? 'bg-emerald-800 text-emerald-100 border border-emerald-700 shadow-xs'
@@ -1074,7 +1103,7 @@ export function RoomsView() {
                             : 'bg-amber-800 text-amber-100 border border-amber-700 shadow-xs'
                         } flex items-center justify-center font-bold text-sm shrink-0`}>
                           <i className={`fa-solid ${
-                            bName === 'Ruang Pertemuan' ? 'fa-landmark' :
+                            isBldSerbaguna ? 'fa-landmark' :
                             bName.includes('Arafah') ? 'fa-kaaba' :
                             bName.includes('Muzdalifah') ? 'fa-mosque' :
                             bName.includes('Mina') ? 'fa-tents' :
@@ -1084,16 +1113,20 @@ export function RoomsView() {
                         <div>
                           <div className="flex items-center space-x-2">
                             <h3 className="font-bold text-sm text-slate-900">
-                              {bName === 'Ruang Pertemuan' ? 'Gedung dan Ruang Pertemuan (Aula / Rapat)' : `${bName} (Kamar Hunian)`}
+                              {bName === 'Ruang Pertemuan' 
+                                ? 'Gedung dan Ruang Pertemuan (Aula / Rapat)' 
+                                : isBldSerbaguna
+                                ? `${bName} (Gedung Serbaguna / Aula)`
+                                : `${bName} (Kamar Hunian)`}
                             </h3>
                             {isCollapsed && (
                               <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded font-semibold border border-amber-200">
-                                {bName === 'Ruang Pertemuan' ? 'Ruang Disembunyikan' : 'Kamar Disembunyikan'}
+                                {isBldSerbaguna ? 'Ruang Disembunyikan' : 'Kamar Disembunyikan'}
                               </span>
                             )}
                           </div>
                           <p className="text-[11px] text-slate-500">
-                            {bRooms.length} {bName === 'Ruang Pertemuan' ? 'Ruang Pertemuan' : 'Kamar Hunian'} | {OFFICIAL_TARIFFS[bName]?.desc || 'Tarif Resmi UPT'}
+                            {bRooms.length} {isBldSerbaguna ? 'Ruang Pertemuan / Aula' : 'Kamar Hunian'} | {OFFICIAL_TARIFFS[bName]?.desc || 'Tarif Resmi UPT'}
                           </p>
                         </div>
                       </div>
@@ -1123,13 +1156,38 @@ export function RoomsView() {
 
                     {/* Rooms Grid */}
                     {!isCollapsed && (
-                      <div className={`p-4 grid gap-3.5 ${
-                        bName === 'Ruang Pertemuan'
-                          ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                          : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
-                      }`}>
-                        {bRooms.map(r => getRoomCard(r))}
-                      </div>
+                      bRooms.length === 0 ? (
+                        <div className="p-8 text-center bg-slate-50/70 border-t border-slate-100 rounded-b-xl space-y-2">
+                          <i className="fa-solid fa-bed text-3xl text-slate-300"></i>
+                          <p className="text-xs font-bold text-slate-700">Belum ada unit kamar terdaftar di {bName}.</p>
+                          <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                            Gedung ini baru didaftarkan atau belum memiliki kamar. Anda dapat menambahkan kamar baru secara manual.
+                          </p>
+                          {canManageRooms && (
+                            <div className="pt-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setRoomToEdit(null);
+                                  setIsRoomModalOpen(true);
+                                }}
+                                className="px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition inline-flex items-center space-x-1.5 cursor-pointer"
+                              >
+                                <i className="fa-solid fa-plus"></i>
+                                <span>+ Tambah Kamar ke {bName}</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className={`p-4 grid gap-3.5 ${
+                          bName === 'Ruang Pertemuan'
+                            ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+                            : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+                        }`}>
+                          {bRooms.map(r => getRoomCard(r))}
+                        </div>
+                      )
                     )}
                   </div>
                 );

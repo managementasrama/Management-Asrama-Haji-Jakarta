@@ -59,9 +59,9 @@ export function ReportsView() {
           <span className="text-[10px] text-slate-400">Total riwayat rombongan: {totalRombonganCount}</span>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-xs border border-slate-200">
-          <p className="text-xs font-semibold text-slate-500 uppercase">Kamar Individu Aktif</p>
+          <p className="text-xs font-semibold text-slate-500 uppercase">Penyewaan Kamar Aktif</p>
           <p className="text-2xl font-bold text-emerald-600">{individuActiveCount}</p>
-          <span className="text-[10px] text-slate-400">Total riwayat individu: {totalIndividuCount}</span>
+          <span className="text-[10px] text-slate-400">Total riwayat hunian: {totalIndividuCount}</span>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-xs border border-slate-200">
           <p className="text-xs font-semibold text-slate-500 uppercase">Sewa Aula (Aktif)</p>
@@ -122,7 +122,7 @@ export function ReportsView() {
               className={`px-3 py-1.5 rounded-md transition flex items-center space-x-1.5 whitespace-nowrap ${activeTab === 'INDIVIDU' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'}`}
             >
               <i className="fa-solid fa-bed"></i>
-              <span>Kamar Individu ({individuList.length})</span>
+              <span>Penyewaan Kamar ({individuList.length})</span>
             </button>
             <button
               type="button"
@@ -420,7 +420,8 @@ export function ReportsView() {
         )}
 
         {/* ========================================================================= */}
-        {/* BAGIAN 2: TABEL KAMAR INDIVIDU (BUKAN ROMBONGAN) */}
+        {/* ========================================================================= */}
+        {/* BAGIAN 2: TABEL PENYEWAAN HUNIAN KAMAR (INDIVIDU & ROMBONGAN) */}
         {/* ========================================================================= */}
         {(activeTab === 'ALL' || activeTab === 'INDIVIDU') && (
           <div className="space-y-2 pt-4 border-t border-slate-200">
@@ -429,7 +430,7 @@ export function ReportsView() {
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 <h4 className="font-bold text-slate-800 text-sm flex items-center gap-1.5">
                   <i className="fa-solid fa-bed text-emerald-600"></i>
-                  <span>Laporan Hunian Kamar Individu / Reguler (Non-Rombongan)</span>
+                  <span>Laporan Penyewaan Hunian Kamar</span>
                 </h4>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                   {individuList.length} Kamar
@@ -442,13 +443,14 @@ export function ReportsView() {
                 <thead className="bg-slate-100 dark:bg-slate-900 uppercase text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
                   <tr>
                     <th className="p-3">ID Transaksi</th>
-                    <th className="p-3">Gedung & No Kamar</th>
+                    <th className="p-3">Gedung &amp; No Kamar</th>
+                    <th className="p-3">Tipe Sewa</th>
                     <th className="p-3">Kategori Tamu</th>
                     <th className="p-3">Nama Tamu</th>
                     <th className="p-3">Tanggal Check-In</th>
                     <th className="p-3">Tanggal Check-Out</th>
                     <th className="p-3">Durasi</th>
-                    <th className="p-3">Extra Bed & Sarapan</th>
+                    <th className="p-3">Extra Bed &amp; Sarapan</th>
                     <th className="p-3 text-center">Status</th>
                     <th className="p-3 text-center">Aksi Dokumen</th>
                   </tr>
@@ -456,8 +458,8 @@ export function ReportsView() {
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-850">
                   {individuList.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="p-6 text-center text-slate-400 italic">
-                        Tidak ada transaksi kamar individu yang sesuai dengan filter.
+                      <td colSpan={11} className="p-6 text-center text-slate-400 italic">
+                        Tidak ada transaksi penyewaan hunian kamar yang sesuai dengan filter.
                       </td>
                     </tr>
                   ) : (
@@ -469,6 +471,24 @@ export function ReportsView() {
                           <td className="p-3 font-bold text-slate-800 dark:text-slate-200">
                             {tx.roomNumber} 
                             <span className="block text-[10px] font-normal text-slate-400">{tx.building}</span>
+                          </td>
+                          <td className="p-3">
+                            {tx.isGroup || tx.guestType === 'ROMBONGAN' || tx.groupId ? (
+                              <div className="space-y-0.5">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-700 whitespace-nowrap">
+                                  <i className="fa-solid fa-users-rectangle mr-1"></i> Rombongan
+                                </span>
+                                {tx.groupName && (
+                                  <span className="block text-[10px] text-purple-700 dark:text-purple-300 font-semibold truncate max-w-[120px]" title={tx.groupName}>
+                                    {tx.groupName}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 whitespace-nowrap">
+                                <i className="fa-solid fa-user mr-1"></i> Individu
+                              </span>
+                            )}
                           </td>
                           <td className="p-3">
                             <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-medium border border-slate-200 dark:border-slate-700">
@@ -739,67 +759,67 @@ export function MaintenanceReportsView() {
     <div className="space-y-4">
       {/* 4 Step Alur Maintenance Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white p-3.5 rounded-xl shadow-xs border border-amber-200 flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-xs border border-amber-200 dark:border-amber-700/60 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-amber-800">1. Butuh Penugasan</span>
-            <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs">
+            <span className="text-[11px] font-bold text-amber-800 dark:text-amber-300">1. Butuh Penugasan</span>
+            <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xs">
               <i className="fa-solid fa-user-plus"></i>
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-black text-amber-900">{waitingAssignmentCount}</span>
-            <p className="text-[10px] text-amber-700 mt-0.5">Menunggu respon Manager</p>
+            <span className="text-2xl font-black text-amber-900 dark:text-amber-200">{waitingAssignmentCount}</span>
+            <p className="text-[10px] text-amber-700 dark:text-amber-300/90 mt-0.5">Menunggu respon Manager</p>
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl shadow-xs border border-blue-200 flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-xs border border-blue-200 dark:border-blue-700/60 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-blue-800">2. Sedang Dikerjakan</span>
-            <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-xs">
+            <span className="text-[11px] font-bold text-blue-800 dark:text-blue-300">2. Sedang Dikerjakan</span>
+            <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 flex items-center justify-center text-xs">
               <i className="fa-solid fa-screwdriver-wrench"></i>
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-black text-blue-900">{inProcessCount}</span>
-            <p className="text-[10px] text-blue-700 mt-0.5">Penanganan teknisi di lokasi</p>
+            <span className="text-2xl font-black text-blue-900 dark:text-blue-200">{inProcessCount}</span>
+            <p className="text-[10px] text-blue-700 dark:text-blue-300/90 mt-0.5">Penanganan teknisi di lokasi</p>
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl shadow-xs border border-amber-300 flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-xs border border-purple-300 dark:border-purple-600/60 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-hajj-900">3. Menunggu Cek QC</span>
-            <div className="w-7 h-7 rounded-lg bg-gold-100 text-hajj-800 flex items-center justify-center text-xs">
+            <span className="text-[11px] font-bold text-purple-900 dark:text-purple-300">3. Menunggu Cek QC</span>
+            <div className="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-950/80 text-purple-800 dark:text-purple-200 flex items-center justify-center text-xs">
               <i className="fa-solid fa-clipboard-check"></i>
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-black text-hajj-900">{waitingQcCount}</span>
-            <p className="text-[10px] text-hajj-700 mt-0.5">Selesai diperbaiki, siap inspeksi</p>
+            <span className="text-2xl font-black text-purple-900 dark:text-purple-200">{waitingQcCount}</span>
+            <p className="text-[10px] text-purple-700 dark:text-purple-300/90 mt-0.5">Selesai diperbaiki, siap inspeksi</p>
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl shadow-xs border border-emerald-200 flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-800 p-3.5 rounded-xl shadow-xs border border-emerald-200 dark:border-emerald-600/60 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-emerald-800">4. Selesai Tuntas</span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">
+            <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300">4. Selesai Tugas &amp; Lolos QC</span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xs">
               <i className="fa-solid fa-circle-check"></i>
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-black text-emerald-900">{finishedCount}</span>
-            <p className="text-[10px] text-emerald-700 mt-0.5">Lolos standar QC UPT</p>
+            <span className="text-2xl font-black text-emerald-900 dark:text-emerald-200">{finishedCount}</span>
+            <p className="text-[10px] text-emerald-700 dark:text-emerald-300/90 mt-0.5">Tuntas diperbaiki &amp; lolos QC</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+      <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700 pb-4">
           <div>
-            <h3 className="text-base font-bold text-slate-800 flex items-center">
-              <i className="fa-solid fa-screwdriver-wrench text-amber-600 mr-2"></i>
-              Laporan Perawatan & Maintenance Fasilitas
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center">
+              <i className="fa-solid fa-screwdriver-wrench text-amber-600 dark:text-amber-400 mr-2"></i>
+              Laporan Perawatan &amp; Maintenance Fasilitas
             </h3>
-            <p className="text-xs text-slate-500">Rekapitulasi kerusakan, alur penugasan teknisi, pelaporan perbaikan fisik, dan pengesahan inspeksi QC.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-300">Rekapitulasi kerusakan, alur penugasan teknisi, pelaporan perbaikan fisik, dan pengesahan inspeksi QC.</p>
           </div>
           <div className="flex items-center space-x-2">
             <button 
@@ -824,14 +844,14 @@ export function MaintenanceReportsView() {
         </div>
 
         {/* Filter Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/80 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
           <div className="flex flex-wrap items-center gap-2">
             {/* Fasilitas */}
             <select
               value={facilityFilter}
               onChange={(e) => setFacilityFilter(e.target.value)}
               aria-label="Filter fasilitas gedung"
-              className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-hajj-700 focus:outline-none"
+              className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-hajj-700 focus:outline-none"
             >
               <option value="ALL">Semua Fasilitas</option>
               <option value="KAMAR">Gedung (Kamar Hunian)</option>
@@ -843,13 +863,13 @@ export function MaintenanceReportsView() {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               aria-label="Filter status perbaikan"
-              className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-hajj-700 focus:outline-none"
+              className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-hajj-700 focus:outline-none"
             >
               <option value="ALL">Semua Status Alur</option>
               <option value="MENUNGGU_PENUGASAN">1. Menunggu Penugasan</option>
               <option value="PROSES">2. Sedang Dikerjakan</option>
               <option value="MENUNGGU_QC">3. Menunggu Cek QC</option>
-              <option value="SELESAI">4. Lolos QC & Selesai</option>
+              <option value="SELESAI">4. Lolos QC &amp; Selesai</option>
             </select>
 
             {/* Urgensi Filter */}
@@ -857,7 +877,7 @@ export function MaintenanceReportsView() {
               value={urgencyFilter}
               onChange={(e) => setUrgencyFilter(e.target.value)}
               aria-label="Filter tingkat urgensi"
-              className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-hajj-700 focus:outline-none"
+              className="px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-hajj-700 focus:outline-none"
             >
               <option value="ALL">Semua Tingkat Urgensi</option>
               <option value="Urgent">Urgent</option>
@@ -873,29 +893,29 @@ export function MaintenanceReportsView() {
               placeholder="Cari kamar, teknisi, kerusakan..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-hajj-700 focus:outline-none w-48 sm:w-60"
+              className="pl-8 pr-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-100 rounded-lg text-xs focus:ring-2 focus:ring-hajj-700 focus:outline-none w-48 sm:w-60"
             />
             <i className="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
           </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto border border-slate-200 rounded-xl">
-          <table className="w-full text-left text-xs text-slate-700">
-            <thead className="bg-slate-100 uppercase text-slate-600 font-bold border-b border-slate-200">
+        <div className="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
+          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+            <thead className="bg-slate-100 dark:bg-slate-900 uppercase text-slate-700 dark:text-slate-200 font-bold border-b border-slate-200 dark:border-slate-700">
               <tr>
-                <th className="p-3 text-center whitespace-nowrap w-28">Waktu Lapor</th>
-                <th className="p-3 whitespace-nowrap w-36">Fasilitas / Lokasi</th>
-                <th className="p-3 text-center whitespace-nowrap w-32">Kategori</th>
-                <th className="p-3 text-center whitespace-nowrap w-28">Urgensi</th>
-                <th className="p-3 min-w-[220px]">Deskripsi & Catatan</th>
-                <th className="p-3 whitespace-nowrap w-36">Teknisi PJ</th>
-                <th className="p-3 whitespace-nowrap w-28">Pelapor</th>
-                <th className="p-3 text-center whitespace-nowrap w-40">Status Alur</th>
-                <th className="p-3 text-center whitespace-nowrap min-w-[150px]">Tindakan Alur</th>
+                <th className="p-3 text-center whitespace-nowrap w-28 text-slate-700 dark:text-slate-200">Waktu Lapor</th>
+                <th className="p-3 whitespace-nowrap w-36 text-slate-700 dark:text-slate-200">Fasilitas / Lokasi</th>
+                <th className="p-3 text-center whitespace-nowrap w-32 text-slate-700 dark:text-slate-200">Kategori</th>
+                <th className="p-3 text-center whitespace-nowrap w-28 text-slate-700 dark:text-slate-200">Urgensi</th>
+                <th className="p-3 min-w-[220px] text-slate-700 dark:text-slate-200">Deskripsi &amp; Catatan</th>
+                <th className="p-3 whitespace-nowrap w-36 text-slate-700 dark:text-slate-200">Teknisi PJ</th>
+                <th className="p-3 whitespace-nowrap w-28 text-slate-700 dark:text-slate-200">Pelapor</th>
+                <th className="p-3 text-center whitespace-nowrap w-40 text-slate-700 dark:text-slate-200">Status Alur</th>
+                <th className="p-3 text-center whitespace-nowrap min-w-[150px] text-slate-700 dark:text-slate-200">Tindakan Alur</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
               {filteredMaintenances.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="p-8 text-center text-slate-400 italic">
@@ -904,67 +924,67 @@ export function MaintenanceReportsView() {
                 </tr>
               ) : (
                 filteredMaintenances.map(m => (
-                  <tr key={m.id} className="hover:bg-slate-50 transition">
-                    <td className="p-3 font-mono text-[11px] text-slate-600 text-center whitespace-nowrap">{m.reportTime}</td>
-                    <td className="p-3 font-bold text-slate-800 whitespace-nowrap">
+                  <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
+                    <td className="p-3 font-mono text-[11px] text-slate-600 dark:text-slate-300 text-center whitespace-nowrap">{m.reportTime}</td>
+                    <td className="p-3 font-bold text-slate-800 dark:text-slate-100 whitespace-nowrap">
                       <div className="flex items-center space-x-1.5">
-                        <i className={`fa-solid ${m.building === 'Ruang Pertemuan' ? 'fa-landmark text-purple-700' : 'fa-bed text-slate-500'} text-xs`}></i>
+                        <i className={`fa-solid ${m.building === 'Ruang Pertemuan' ? 'fa-landmark text-purple-700 dark:text-purple-400' : 'fa-bed text-slate-500 dark:text-slate-400'} text-xs`}></i>
                         <span>{m.roomNumber}</span>
                       </div>
-                      <span className="block text-[10px] font-normal text-slate-400 mt-0.5">{m.building}</span>
+                      <span className="block text-[10px] font-normal text-slate-400 dark:text-slate-400 mt-0.5">{m.building}</span>
                     </td>
                     <td className="p-3 text-center whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-900 font-semibold text-[10px]">
+                      <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-700 text-amber-900 dark:text-amber-200 font-semibold text-[10px]">
                         {m.category}
                       </span>
                     </td>
                     <td className="p-3 text-center whitespace-nowrap">{getUrgBadge(m.urgency)}</td>
-                    <td className="p-3 text-slate-700 max-w-xs">
-                      <p className="font-semibold text-slate-900 leading-snug" title={m.description}>{m.description}</p>
+                    <td className="p-3 text-slate-700 dark:text-slate-200 max-w-xs">
+                      <p className="font-semibold text-slate-900 dark:text-slate-100 leading-snug" title={m.description}>{m.description}</p>
                       {m.managerNotes && (
-                        <div className="text-[10px] text-amber-900 font-medium bg-amber-50/90 p-1.5 rounded-md mt-1 border border-amber-200 flex items-start space-x-1">
-                          <i className="fa-solid fa-clipboard-user text-amber-600 mt-0.5 shrink-0"></i>
+                        <div className="text-[10px] text-amber-900 dark:text-amber-200 font-medium bg-amber-50/90 dark:bg-amber-950/70 p-1.5 rounded-md mt-1 border border-amber-200 dark:border-amber-700 flex items-start space-x-1">
+                          <i className="fa-solid fa-clipboard-user text-amber-600 dark:text-amber-400 mt-0.5 shrink-0"></i>
                           <span><strong>Manager:</strong> {m.managerNotes}</span>
                         </div>
                       )}
                       {m.technicianNotes && (
-                        <div className="text-[10px] text-blue-900 font-medium bg-blue-50/90 p-1.5 rounded-md mt-1 border border-blue-200 flex items-start space-x-1">
-                          <i className="fa-solid fa-wrench text-blue-600 mt-0.5 shrink-0"></i>
+                        <div className="text-[10px] text-blue-900 dark:text-blue-200 font-medium bg-blue-50/90 dark:bg-blue-950/70 p-1.5 rounded-md mt-1 border border-blue-200 dark:border-blue-700 flex items-start space-x-1">
+                          <i className="fa-solid fa-wrench text-blue-600 dark:text-blue-400 mt-0.5 shrink-0"></i>
                           <span><strong>Teknisi:</strong> {m.technicianNotes}</span>
                         </div>
                       )}
                     </td>
-                    <td className="p-3 font-medium text-slate-800 whitespace-nowrap">
+                    <td className="p-3 font-medium text-slate-800 dark:text-slate-200 whitespace-nowrap">
                       <div className="flex items-center space-x-1.5">
-                        <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-600 shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] text-slate-600 dark:text-slate-300 shrink-0">
                           <i className="fa-solid fa-user-gear"></i>
                         </div>
-                        <span className="font-semibold text-slate-800 text-xs">{m.technician}</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-100 text-xs">{m.technician}</span>
                       </div>
                       {m.assignedBy && (
-                        <span className="block text-[9px] text-slate-400 mt-0.5">Oleh: {m.assignedBy}</span>
+                        <span className="block text-[9px] text-slate-400 dark:text-slate-400 mt-0.5">Oleh: {m.assignedBy}</span>
                       )}
                     </td>
-                    <td className="p-3 text-slate-600 whitespace-nowrap text-xs">{m.reportedUser || 'Petugas'}</td>
+                    <td className="p-3 text-slate-600 dark:text-slate-300 whitespace-nowrap text-xs">{m.reportedUser || 'Petugas'}</td>
                     <td className="p-3 text-center whitespace-nowrap">
                       {m.status === 'MENUNGGU_PENUGASAN' && (
-                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-300 inline-flex items-center shadow-2xs">
-                          <i className="fa-solid fa-clock mr-1.5 text-amber-600"></i> 1. Butuh Penugasan
+                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 dark:bg-amber-950/80 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-600 inline-flex items-center shadow-2xs">
+                          <i className="fa-solid fa-clock mr-1.5 text-amber-600 dark:text-amber-400"></i> 1. Butuh Penugasan
                         </span>
                       )}
                       {m.status === 'PROSES' && (
-                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-50 text-blue-900 border border-blue-300 inline-flex items-center shadow-2xs">
-                          <i className="fa-solid fa-screwdriver-wrench mr-1.5 text-blue-600"></i> 2. Sedang Dikerjakan
+                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-50 dark:bg-blue-950/80 text-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-600 inline-flex items-center shadow-2xs">
+                          <i className="fa-solid fa-screwdriver-wrench mr-1.5 text-blue-600 dark:text-blue-400"></i> 2. Sedang Dikerjakan
                         </span>
                       )}
                       {m.status === 'MENUNGGU_QC' && (
-                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-purple-50 text-purple-900 border border-purple-300 inline-flex items-center shadow-2xs">
-                          <i className="fa-solid fa-clipboard-check mr-1.5 text-purple-700"></i> 3. Menunggu Cek QC
+                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-purple-50 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-500 inline-flex items-center shadow-2xs">
+                          <i className="fa-solid fa-clipboard-check mr-1.5 text-purple-700 dark:text-purple-300"></i> 3. Menunggu Cek QC
                         </span>
                       )}
                       {m.status === 'SELESAI' && (
-                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-50 text-emerald-900 border border-emerald-300 inline-flex items-center shadow-2xs">
-                          <i className="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i> 4. Selesai (Lolos QC)
+                        <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-500 inline-flex items-center shadow-2xs">
+                          <i className="fa-solid fa-circle-check mr-1.5 text-emerald-600 dark:text-emerald-300"></i> 4. Selesai Tugas (Lolos QC)
                         </span>
                       )}
                     </td>
@@ -982,14 +1002,14 @@ export function MaintenanceReportsView() {
                               <span>Tugaskan</span>
                             </button>
                           ) : (
-                            <span className="text-[10px] text-amber-700 font-semibold bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                            <span className="text-[10px] text-amber-800 dark:text-amber-200 font-bold bg-amber-50 dark:bg-amber-950/70 px-2 py-1 rounded border border-amber-200 dark:border-amber-700">
                               Tunggu Manager
                             </span>
                           )}
                           <button 
                             type="button"
                             onClick={() => openModal('modalRoomDetail', { roomId: m.roomId })}
-                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs transition cursor-pointer"
+                            className="p-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 rounded-lg text-xs transition cursor-pointer"
                             title="Lihat Rincian Fasilitas"
                           >
                             <i className="fa-solid fa-eye text-[11px]"></i>
@@ -1004,8 +1024,8 @@ export function MaintenanceReportsView() {
                               <button 
                                 type="button"
                                 onClick={() => openModal('modalUpdateMaintenance', { maintenance: m })} 
-                                className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold rounded-lg text-xs border border-blue-200 flex items-center space-x-1 transition cursor-pointer"
-                                title="Update Catatan & Suku Cadang"
+                                className="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/70 hover:bg-blue-100 dark:hover:bg-blue-900/80 text-blue-800 dark:text-blue-200 font-bold rounded-lg text-xs border border-blue-200 dark:border-blue-700 flex items-center space-x-1 transition cursor-pointer"
+                                title="Update Catatan &amp; Suku Cadang"
                               >
                                 <i className="fa-solid fa-pen-to-square text-[10px]"></i>
                                 <span>Update</span>
@@ -1014,21 +1034,21 @@ export function MaintenanceReportsView() {
                                 type="button"
                                 onClick={() => markMaintenanceRepaired(m.id, 'Pekerjaan perbaikan fisik fasilitas telah diselesaikan dan diverifikasi. Menunggu inspeksi pengesahan QC.')} 
                                 className="px-2.5 py-1.5 bg-hajj-700 hover:bg-hajj-800 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center space-x-1 cursor-pointer"
-                                title="Tandai telah selesai diperbaiki & teruskan ke Tim QC"
+                                title="Tandai telah selesai diperbaiki &amp; teruskan ke Tim QC"
                               >
                                 <i className="fa-solid fa-paper-plane text-[10px]"></i>
                                 <span>Kirim QC</span>
                               </button>
                             </>
                           ) : (
-                            <span className="text-[10px] text-blue-700 font-semibold bg-blue-50 px-2 py-1 rounded border border-blue-200">
+                            <span className="text-[10px] text-blue-800 dark:text-blue-200 font-bold bg-blue-50 dark:bg-blue-950/70 px-2 py-1 rounded border border-blue-200 dark:border-blue-700">
                               Dalam Proses
                             </span>
                           )}
                           <button 
                             type="button"
                             onClick={() => openModal('modalRoomDetail', { roomId: m.roomId })}
-                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs transition cursor-pointer"
+                            className="p-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 rounded-lg text-xs transition cursor-pointer"
                             title="Lihat Rincian Fasilitas"
                           >
                             <i className="fa-solid fa-eye text-[11px]"></i>
@@ -1049,14 +1069,14 @@ export function MaintenanceReportsView() {
                               <span>Inspeksi QC</span>
                             </button>
                           ) : (
-                            <span className="text-[10px] text-purple-700 font-semibold bg-purple-50 px-2 py-1 rounded border border-purple-200">
+                            <span className="text-[10px] text-purple-800 dark:text-purple-200 font-bold bg-purple-50 dark:bg-purple-950/80 px-2.5 py-1 rounded border border-purple-200 dark:border-purple-600">
                               Menunggu QC
                             </span>
                           )}
                           <button 
                             type="button"
                             onClick={() => openModal('modalRoomDetail', { roomId: m.roomId })}
-                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs transition cursor-pointer"
+                            className="p-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200 rounded-lg text-xs transition cursor-pointer"
                             title="Lihat Rincian Fasilitas"
                           >
                             <i className="fa-solid fa-eye text-[11px]"></i>
@@ -1066,14 +1086,14 @@ export function MaintenanceReportsView() {
 
                       {m.status === 'SELESAI' && (
                         <div className="flex items-center justify-center gap-1.5">
-                          <span className="px-2 py-1 bg-emerald-50 text-emerald-800 text-[10px] font-bold rounded border border-emerald-200 flex items-center space-x-1">
-                            <i className="fa-solid fa-check text-emerald-600 text-[10px]"></i>
-                            <span>Lolos QC</span>
+                          <span className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-200 text-[10px] font-bold rounded border border-emerald-200 dark:border-emerald-600 flex items-center space-x-1">
+                            <i className="fa-solid fa-check text-emerald-600 dark:text-emerald-300 text-[10px]"></i>
+                            <span>Selesai Tugas (Lolos QC)</span>
                           </span>
                           <button 
                             type="button"
                             onClick={() => openModal('modalUpdateMaintenance', { maintenance: m })} 
-                            className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs flex items-center space-x-1 transition cursor-pointer"
+                            className="px-2 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold rounded-lg text-xs flex items-center space-x-1 transition cursor-pointer"
                             title="Lihat Detail Riwayat Perbaikan"
                           >
                             <i className="fa-solid fa-file-lines text-[10px]"></i>
